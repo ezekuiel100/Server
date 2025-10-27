@@ -19,7 +19,18 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	fmt.Println("Nova conexão de:", conn)
+	defer conn.Close()
+	fmt.Println("ip de quem conectou:", conn.RemoteAddr())
+
+	buf := make([]byte, 1024)
+	n, err := conn.Read(buf)
+	if err != nil {
+		fmt.Println("Erro de leitura:", err)
+		return
+	}
+
+	fmt.Println("Mensagem:", string(buf[:n]))
+	conn.Write([]byte("Recebido!\n"))
 
 }
 
