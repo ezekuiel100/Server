@@ -6,10 +6,14 @@ import (
 )
 
 func main() {
-	ln, _ := net.Listen("tcp", ":8000")
+	ln, err := net.Listen("tcp", ":8000")
+	if err != nil {
+		fmt.Println("Erro ao iniciar o servidor:", err)
+		return
+	}
 	defer ln.Close()
 
-	fmt.Println("Servidor escutando em :8080...")
+	fmt.Println("Servidor escutando em :8000...")
 
 	for {
 		conn, _ := ln.Accept()
@@ -20,7 +24,7 @@ func main() {
 
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
-	fmt.Println("ip de quem conectou:", conn.RemoteAddr())
+	fmt.Println(conn.RemoteAddr())
 
 	buf := make([]byte, 1024)
 	n, err := conn.Read(buf)
@@ -29,9 +33,8 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
-	fmt.Println("Mensagem:", string(buf[:n]))
-	conn.Write([]byte("Recebido!\n"))
+	fmt.Println(string(buf[:n]))
 
+	response := "HTTP/1.1 200 OK\r\n\r\nHello, world!"
+	conn.Write([]byte(response))
 }
-
-//
